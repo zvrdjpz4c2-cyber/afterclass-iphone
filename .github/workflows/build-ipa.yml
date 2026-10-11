@@ -1,0 +1,30 @@
+name: Build iPhone IPA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Afterclass for iPhone
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: Get app source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Extract iPhone project
+        run: unzip -q afterclass-ios-cloud-source.zip -d ios
+      - name: Compile and package unsigned iPhone app
+        working-directory: ios
+        run: bash "Build IPA.command"
+      - name: Downloadable IPA
+        uses: actions/upload-artifact@v7
+        with:
+          name: Afterclass-iPhone-IPA
+          path: ios/dist/Afterclass-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 7
